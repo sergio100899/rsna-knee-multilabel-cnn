@@ -1,3 +1,5 @@
+# Dependencias directas (las mismas que pyproject.toml; versiones exactas en uv.lock).
+# PyTorch con CUDA 12.8: instalarlo antes desde su índice (ver README, paso 2).
 ipykernel==7.4.0
 matplotlib==3.11.2
 numpy==2.5.3
@@ -7,6 +9,7 @@ pylibjpeg==2.1.0
 pylibjpeg-libjpeg==2.4.0
 pylibjpeg-openjpeg==2.6.0
 scikit-learn==1.9.1
+sentence-transformers==6.2.0
 torch==2.11.0
 torchvision==0.26.0
 tqdm==4.70.1
