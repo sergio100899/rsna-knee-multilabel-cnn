@@ -8,11 +8,14 @@ Predicción de 12 hallazgos en resonancias de rodilla ([RSNA Knee Abnormality De
 
 ```
 .
-├── config.py    hallazgos y rutas comunes
-├── data/        dataset y archivos generados · data/README.md
-├── etiquetas/   etiquetas débiles · etiquetas/README.md
-├── imagenes/    dataset de imágenes y folds · imagenes/README.md
-└── informe/     informe en PDF (formato NeurIPS)
+├── config.py        hallazgos y rutas comunes
+├── data/            dataset y archivos generados · data/README.md
+├── main.py          todo el pipeline con un comando
+├── etiquetas/       etiquetas débiles · etiquetas/README.md
+├── imagenes/        dataset de imágenes y folds · imagenes/README.md
+├── entrenamiento/   maestro-alumno con las dos arquitecturas · entrenamiento/README.md
+├── evaluacion/      métricas en gold, sesgo y Grad-CAM · evaluacion/README.md
+└── informe/         informe en PDF (formato NeurIPS)
 ```
 
 ## Instalación
@@ -50,7 +53,16 @@ Estructura del dataset: [data/README.md](data/README.md)
 
 ## Orden de ejecución
 
-Los comandos se ejecutan desde la raíz del repositorio.
+Los comandos se ejecutan desde la raíz del repositorio. Todo con un comando:
+
+```bash
+uv run python main.py   # con uv
+python main.py          # con pip (con el entorno .venv activado)
+```
+
+O paso a paso:
 
 1. Etiquetas débiles: [etiquetas/README.md](etiquetas/README.md)
 2. Dataset de imágenes: [imagenes/README.md](imagenes/README.md)
+3. Entrenamiento: [entrenamiento/README.md](entrenamiento/README.md)
+4. Evaluación: [evaluacion/README.md](evaluacion/README.md)

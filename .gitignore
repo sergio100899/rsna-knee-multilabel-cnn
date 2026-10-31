@@ -8,3 +8,14 @@ __pycache__/
 data/*
 !data/.gitkeep
 !data/README.md
+
+# LaTeX
+informe/*.aux
+informe/*.log
+informe/*.bbl
+informe/*.blg
+informe/*.out
+informe/*.fls
+informe/*.fdb_latexmk
+informe/*.synctex.gz
+informe/*.zip
