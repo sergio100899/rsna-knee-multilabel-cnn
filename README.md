@@ -11,6 +11,7 @@ Predicción de 12 hallazgos en resonancias de rodilla ([RSNA Knee Abnormality De
 ├── config.py    hallazgos y rutas comunes
 ├── data/        dataset y archivos generados · data/README.md
 ├── etiquetas/   etiquetas débiles · etiquetas/README.md
+├── imagenes/    dataset de imágenes y folds · imagenes/README.md
 └── informe/     informe en PDF (formato NeurIPS)
 ```
 
@@ -52,3 +53,4 @@ Estructura del dataset: [data/README.md](data/README.md)
 Los comandos se ejecutan desde la raíz del repositorio.
 
 1. Etiquetas débiles: [etiquetas/README.md](etiquetas/README.md)
+2. Dataset de imágenes: [imagenes/README.md](imagenes/README.md)

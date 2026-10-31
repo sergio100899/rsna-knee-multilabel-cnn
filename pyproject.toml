@@ -5,6 +5,7 @@ description = "Clasificación multietiqueta de anomalías de rodilla en RM con C
 requires-python = ">=3.13"
 dependencies = [
     "ipykernel==7.4.0",
+    "langdetect==1.0.9",
     "matplotlib==3.11.2",
     "numpy==2.5.3",
     "pandas==3.0.6",
