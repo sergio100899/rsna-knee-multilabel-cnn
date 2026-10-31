@@ -7,3 +7,4 @@ __pycache__/
 # Dataset
 data/*
 !data/.gitkeep
+!data/README.md
