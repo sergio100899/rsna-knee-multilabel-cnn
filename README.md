@@ -1,34 +1,36 @@
-# Clasificación multietiqueta de anomalías de rodilla en resonancia magnética con CNN y aprendizaje débilmente supervisado
+# Multilabel classification of knee MRI abnormalities with CNNs and weakly supervised learning
 
-**Examen parcial de Redes Neuronales y Aprendizaje Profundo · Pregunta 1 · UNI FIIS 2026-II**
+**English** · [Español](README.es.md)
 
-Predicción de 12 hallazgos en resonancias de rodilla ([RSNA Knee Abnormality Detection](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection)). Solo 58 de 4407 estudios tienen etiqueta de radiólogo; el resto se etiqueta a partir de los informes en texto libre (etiquetas débiles). Se comparan dos arquitecturas: una CNN 2.5D desde cero y ConvNeXt-Tiny preentrenada en ImageNet.
+**Midterm exam, Neural Networks and Deep Learning · Question 1 · UNI FIIS 2026-II**
 
-## Estructura
+Prediction of 12 findings in knee MRI ([RSNA Knee Abnormality Detection](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection)). Only 58 of 4407 studies have radiologist labels; the rest are labeled from the free-text reports (weak labels). Two architectures are compared: a 2.5D CNN trained from scratch and ConvNeXt-Tiny pretrained on ImageNet.
+
+## Structure
 
 ```
 .
-├── config.py        hallazgos y rutas comunes
-├── data/            dataset y archivos generados · data/README.md
-├── main.py          todo el pipeline con un comando
-├── etiquetas/       etiquetas débiles · etiquetas/README.md
-├── imagenes/        dataset de imágenes y folds · imagenes/README.md
-├── entrenamiento/   maestro-alumno con las dos arquitecturas · entrenamiento/README.md
-├── evaluacion/      métricas en gold, sesgo y Grad-CAM · evaluacion/README.md
-└── informe/         informe en PDF (formato NeurIPS)
+├── config.py        findings and shared paths
+├── data/            dataset and generated files · data/README.md
+├── main.py          the whole pipeline in one command
+├── etiquetas/       weak labels · etiquetas/README.md
+├── imagenes/        image dataset and folds · imagenes/README.md
+├── entrenamiento/   teacher-student training of both architectures · entrenamiento/README.md
+├── evaluacion/      gold metrics, bias and Grad-CAM · evaluacion/README.md
+└── informe/         report in PDF (NeurIPS format)
 ```
 
-## Instalación
+## Installation
 
-Requisitos: Python 3.13 y GPU NVIDIA con CUDA 12.8.
+Requirements: Python 3.13 and an NVIDIA GPU with CUDA 12.8.
 
-**Con uv**
+**With uv**
 
 ```bash
 uv sync
 ```
 
-**Con pip**
+**With pip**
 
 ```bash
 python3.13 -m venv .venv
@@ -37,11 +39,11 @@ pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytor
 pip install -r requirements.txt
 ```
 
-## Descargar el dataset
+## Download the dataset
 
-1. Aceptar las reglas de la competición en <https://www.kaggle.com/competitions/rsna-knee-abnormality-detection/rules>.
-2. Guardar el token de la API de Kaggle (<https://www.kaggle.com/settings> → *Create New Token*) en `~/.kaggle/kaggle.json`.
-3. Descargar (~265 GB) y descomprimir:
+1. Accept the competition rules at <https://www.kaggle.com/competitions/rsna-knee-abnormality-detection/rules>.
+2. Save your Kaggle API token (<https://www.kaggle.com/settings> → *Create New Token*) in `~/.kaggle/kaggle.json`.
+3. Download (~265 GB) and unzip:
 
 ```bash
 pip install kaggle
@@ -49,20 +51,20 @@ kaggle competitions download -c rsna-knee-abnormality-detection -p data
 unzip -q data/rsna-knee-abnormality-detection.zip -d data/rsna
 ```
 
-Estructura del dataset: [data/README.md](data/README.md)
+Dataset structure: [data/README.md](data/README.md)
 
-## Orden de ejecución
+## How to run
 
-Los comandos se ejecutan desde la raíz del repositorio. Todo con un comando:
+Commands are run from the repository root. Everything in one command:
 
 ```bash
-uv run python main.py   # con uv
-python main.py          # con pip (con el entorno .venv activado)
+uv run python main.py   # with uv
+python main.py          # with pip (with the .venv environment activated)
 ```
 
-O paso a paso:
+Or step by step:
 
-1. Etiquetas débiles: [etiquetas/README.md](etiquetas/README.md)
-2. Dataset de imágenes: [imagenes/README.md](imagenes/README.md)
-3. Entrenamiento: [entrenamiento/README.md](entrenamiento/README.md)
-4. Evaluación: [evaluacion/README.md](evaluacion/README.md)
+1. Weak labels: [etiquetas/README.md](etiquetas/README.md)
+2. Image dataset: [imagenes/README.md](imagenes/README.md)
+3. Training: [entrenamiento/README.md](entrenamiento/README.md)
+4. Evaluation: [evaluacion/README.md](evaluacion/README.md)

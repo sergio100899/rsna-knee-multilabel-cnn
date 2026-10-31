@@ -1,17 +1,19 @@
-# evaluacion/
+# evaluacion/ (evaluation)
 
-Evalúa los modelos de `data/runs/` en los 58 estudios gold. Tablas y figuras en `data/resultados/`.
+**English** · [Español](README.es.md)
+
+Evaluates the models in `data/runs/` on the 58 gold studies. Tables and figures go to `data/resultados/`.
 
 ```bash
-uv run python -m evaluacion.metricas   # con uv; con pip: python -m evaluacion.metricas
+uv run python -m evaluacion.metricas   # with uv; with pip: python -m evaluacion.metricas
 uv run python -m evaluacion.sesgo
 uv run python -m evaluacion.gradcam
 ```
 
-| Script | Qué hace | Salida |
+| Script | What it does | Output |
 |---|---|---|
-| `metricas.py` | AUC por hallazgo y macro con IC95 (bootstrap), umbral de Youden elegido fuera de fold → precisión, recall y F1; prevalencia y hallazgos raros | `auc.csv`, `resumen.csv`, `metricas_umbral.csv`, `umbrales.csv`, `prevalencia.png`, `auc_por_hallazgo.png` |
-| `sesgo.py` | AUC fuera de fold de ConvNeXt por idioma del informe y por fabricante del escáner | `sesgo.csv`, `sesgo.png` |
-| `gradcam.py` | Mapas HiResCAM en LCA, menisco medial, derrame y quiste de Baker, y % del mapa en cada plano | `gradcam_*.png`, `gradcam_planos.csv` |
+| `metricas.py` | Per-finding and macro AUC with 95 % CI (bootstrap), Youden threshold chosen out of fold → precision, recall and F1; prevalence and rare findings | `auc.csv`, `resumen.csv`, `metricas_umbral.csv`, `umbrales.csv`, `prevalencia.png`, `auc_por_hallazgo.png` |
+| `sesgo.py` | Out-of-fold AUC of ConvNeXt by report language and scanner manufacturer | `sesgo.csv`, `sesgo.png` |
+| `gradcam.py` | HiResCAM maps for ACL, medial meniscus, effusion and Baker's cyst, and % of the map in each plane | `gradcam_*.png`, `gradcam_planos.csv` |
 
-Cada modelo es el ensamble de sus 5 folds (promedio de probabilidades). Las predicciones se calculan una vez y se guardan en `predicciones.npz` dentro de cada run.
+Each model is the ensemble of its 5 folds (mean of probabilities). Predictions are computed once and stored in `predicciones.npz` inside each run.

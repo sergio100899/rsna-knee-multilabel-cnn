@@ -1,45 +1,48 @@
-# etiquetas/
+# etiquetas/ (labels)
 
-Etiquetas débiles de los 12 hallazgos a partir de los informes radiológicos (texto libre, varios idiomas), para los 4349 estudios sin etiqueta de radiólogo (*silver*). Las etiquetas **gold** (58 estudios, de radiólogos) solo se usan para evaluarlas.
+**English** · [Español](README.es.md)
+
+Weak labels for the 12 findings from the radiology reports (free text, several languages), for the 4349 studies without radiologist labels (*silver*). The **gold** labels (58 studies, from radiologists) are only used to evaluate them.
 
 ```bash
-uv run python -m etiquetas.generar   # con uv
-python -m etiquetas.generar          # con pip (con el entorno .venv activado)
+uv run python -m etiquetas.generar   # with uv
+python -m etiquetas.generar          # with pip (with the .venv environment activated)
 ```
 
-| Orden | Script | Qué hace | Salida en `data/etiquetas/` |
+| Order | Script | What it does | Output in `data/etiquetas/` |
 |---|---|---|---|
-| 1 | `reglas.py` | Reglas multilingües sobre cada cláusula del informe | `etiquetas_reglas.csv` |
-| 2 | `embeddings.py` | Híbrido reglas + EmbeddingGemma (se descarga solo, 1,2 GB) | `etiquetas_hibrido_gemma.csv` |
-| 3 | `evaluar.py` | Validación contra gold | tabla por hallazgo |
+| 0 | `gold.py` | Extracts the 58 radiologist-labeled studies | `gold.csv` |
+| 1 | `reglas.py` | Multilingual rules on each clause of the report | `etiquetas_reglas.csv` |
+| 2 | `embeddings.py` | Hybrid rules + EmbeddingGemma (downloaded automatically, 1.2 GB) | `etiquetas_hibrido_gemma.csv` |
+| 3 | `evaluar.py` | Validation against gold | per-finding table |
 
 ```mermaid
 flowchart LR
-    I["Informe<br/>(texto libre)"] --> C["Cláusulas"]
-    C --> R["Reglas<br/>(reglas.py)"]
-    R --> PR["Puntuación reglas<br/>0,03 · 0,1 · 0,35 · 0,7 · 0,9"]
+    I["Report<br/>(free text)"] --> C["Clauses"]
+    C --> R["Rules<br/>(reglas.py)"]
+    R --> PR["Rule score<br/>0.03 · 0.1 · 0.35 · 0.7 · 0.9"]
     C --> G["EmbeddingGemma"]
-    G --> V["Vector por cláusula<br/>(768 dim.)"]
-    V --> LR["Regresión logística<br/>1 por hallazgo"]
-    R -. "frases donde las reglas<br/>están seguras = etiquetas<br/>para entrenarla" .-> LR
-    LR --> PE["Puntuación embeddings<br/>0–1"]
-    PR --> H(("media<br/>geométrica"))
+    G --> V["Vector per clause<br/>(768 dims)"]
+    V --> LR["Logistic regression<br/>1 per finding"]
+    R -. "clauses where the rules<br/>are confident = training<br/>labels for it" .-> LR
+    LR --> PE["Embedding score<br/>0–1"]
+    PR --> H(("geometric<br/>mean"))
     PE --> H
-    H --> E["Etiqueta híbrida 0–1<br/>etiquetas_hibrido_gemma.csv"]
+    H --> E["Hybrid label 0–1<br/>etiquetas_hibrido_gemma.csv"]
 ```
 
-| Fuente | AUC | Acuerdo | Ruido | Kappa |
+| Source | AUC | Agreement | Noise | Kappa |
 |---|---:|---:|---:|---:|
-| Reglas | 0,816 | 81,3 % | 18,7 % | 0,538 |
-| Híbrido (se usa para entrenar) | 0,856 | 82,2 % | 17,8 % | 0,578 |
+| Rules | 0.816 | 81.3 % | 18.7 % | 0.538 |
+| Hybrid (used for training) | 0.856 | 82.2 % | 17.8 % | 0.578 |
 
-La combinación del híbrido se eligió contra gold entre varias (media, medias ponderadas, máximo, media de rangos y media geométrica). Para comprobar que la mejora no es casualidad, se eligió con 4/5 de gold y se midió en el 1/5 restante: 0,857 frente a 0,847 de la media simple.
+The hybrid combination was chosen against gold among several (mean, weighted means, maximum, rank mean and geometric mean). To check that the gain is not chance, it was chosen on 4/5 of gold and measured on the remaining 1/5: 0.857 versus 0.847 for the plain mean.
 
-`precalculadas/` tiene las etiquetas con las que se entrenaron los modelos: reglas, híbrido y las del maestro (`etiquetas_maestro.csv`, que genera `entrenamiento/`). Para usarlas sin regenerar:
+`precalculadas/` holds the labels the models were trained with: rules, hybrid and teacher labels (`etiquetas_maestro.csv`, produced by `entrenamiento/`). To use them without regenerating:
 
 ```bash
 mkdir -p data/etiquetas && cp etiquetas/precalculadas/*.csv data/etiquetas/
-uv run python -m etiquetas.gold   # gold.csv sale de train.csv
+uv run python -m etiquetas.gold   # gold.csv comes from train.csv
 ```
 
-Con `etiquetas_maestro.csv` se pueden entrenar los alumnos sin entrenar antes los maestros: `python -m entrenamiento.entrenar alumno` y `convnext`.
+With `etiquetas_maestro.csv` the students can be trained without training the teachers first: `python -m entrenamiento.entrenar alumno` and `convnext`.

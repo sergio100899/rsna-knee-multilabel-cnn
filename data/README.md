@@ -1,49 +1,51 @@
 # data/
 
-Resonancias magnéticas de rodilla en DICOM de la competición RSNA Knee Abnormality Detection, con el informe radiológico de cada estudio y 12 etiquetas de radiólogo en 58 de ellos.
+**English** · [Español](README.es.md)
 
-Estructura al descomprimir el zip en `data/rsna/`:
+Knee MRI in DICOM from the RSNA Knee Abnormality Detection competition, with the radiology report of each study and 12 radiologist labels for 58 of them.
+
+Structure after unzipping into `data/rsna/`:
 
 ```
 data/rsna/
-├── train.csv                 un estudio por fila: informe (Report) y 12 etiquetas (solo 58 estudios)
-├── train_series.csv          una serie por fila: plano y tipo de secuencia
+├── train.csv                 one study per row: report (Report) and 12 labels (only 58 studies)
+├── train_series.csv          one series per row: plane and sequence type
 ├── train_series/
-│   └── <estudio>/<serie>/<corte>.dcm
+│   └── <study>/<series>/<slice>.dcm
 ├── test.csv
 ├── test_series.csv
 ├── test_series/
-│   └── <estudio>/<serie>/<corte>.dcm
+│   └── <study>/<series>/<slice>.dcm
 └── sample_submission.csv
 ```
 
-| Archivo / carpeta | Contenido |
+| File / folder | Contents |
 |---|---|
-| `train.csv` | 4407 estudios. Columnas: `StudyInstanceUID`, `Report` (informe en texto libre, en varios idiomas) y los 12 hallazgos (`ACL`, `MCL`, `Medial Meniscus`, `Lateral Meniscus`, `Medial OA`, `Lateral OA`, `PF OA`, `Effusion`, `Synovitis`, `Baker's`, `Contusion`, `Fracture`). Los hallazgos (0/1) solo están rellenos en los 58 estudios gold |
-| `train_series.csv` | 24 371 series. Columnas: `StudyInstanceUID`, `SeriesInstanceUID`, `Anatomical_Plane` (Sagittal, Coronal o Axial), `Fluid_Sensitive` y `Fat_Suppression` (0/1) |
-| `train_series/` | Imágenes de entrenamiento: un archivo DICOM por corte (~819 000), agrupados por estudio y serie |
-| `test.csv` | `StudyInstanceUID` de los estudios de test (3 de muestra; Kaggle los reemplaza por el test oculto al evaluar) |
-| `test_series.csv` | Igual que `train_series.csv`, para el test |
-| `test_series/` | Imágenes DICOM del test, con la misma estructura que `train_series/` |
-| `sample_submission.csv` | Formato de envío: `StudyInstanceUID` y una probabilidad por cada uno de los 12 hallazgos |
+| `train.csv` | 4407 studies. Columns: `StudyInstanceUID`, `Report` (free-text report, in several languages) and the 12 findings (`ACL`, `MCL`, `Medial Meniscus`, `Lateral Meniscus`, `Medial OA`, `Lateral OA`, `PF OA`, `Effusion`, `Synovitis`, `Baker's`, `Contusion`, `Fracture`). The findings (0/1) are only filled in for the 58 gold studies |
+| `train_series.csv` | 24 371 series. Columns: `StudyInstanceUID`, `SeriesInstanceUID`, `Anatomical_Plane` (Sagittal, Coronal or Axial), `Fluid_Sensitive` and `Fat_Suppression` (0/1) |
+| `train_series/` | Training images: one DICOM file per slice (~819 000), grouped by study and series |
+| `test.csv` | `StudyInstanceUID` of the test studies (3 samples; Kaggle replaces them with the hidden test set when scoring) |
+| `test_series.csv` | Same as `train_series.csv`, for the test set |
+| `test_series/` | Test DICOM images, with the same structure as `train_series/` |
+| `sample_submission.csv` | Submission format: `StudyInstanceUID` and one probability for each of the 12 findings |
 
-## Estudio, serie, plano y corte
+## Study, series, plane and slice
 
 ```mermaid
 flowchart LR
-    E["<b>Estudio</b><br/>una resonancia de la rodilla<br/>de un paciente + su informe"]
-    E --> S1["<b>Serie</b> sagital<br/>(de lado)"]
-    E --> S2["<b>Serie</b> coronal<br/>(de frente)"]
-    E --> S3["<b>Serie</b> axial<br/>(desde arriba)"]
-    E --> S4["<b>Serie</b> …<br/>otra secuencia u otro plano"]
-    S1 --> C1["corte 1"] & C2["corte 2"] & C3["…"] & C4["corte N"]
+    E["<b>Study</b><br/>one knee MRI<br/>of a patient + its report"]
+    E --> S1["<b>Series</b> sagittal<br/>(side view)"]
+    E --> S2["<b>Series</b> coronal<br/>(front view)"]
+    E --> S3["<b>Series</b> axial<br/>(top view)"]
+    E --> S4["<b>Series</b> …<br/>another sequence or plane"]
+    S1 --> C1["slice 1"] & C2["slice 2"] & C3["…"] & C4["slice N"]
 ```
 
-- **Estudio:** una sesión de resonancia de una rodilla. Tiene un informe del radiólogo y es la unidad que se clasifica: los 12 hallazgos se predicen por estudio.
-- **Serie:** una adquisición dentro del estudio, en un **plano** y con un tipo de **secuencia**. Un estudio suele tener 5 series (de 3 a 14): cada plano puede tener varias, con distinta secuencia.
-  - **Plano:** la dirección del corte.
-    - **Sagital:** de lado. Se ven bien los ligamentos cruzados (ACL) y los meniscos.
-    - **Coronal:** de frente. Se ven el MCL y los compartimentos medial y lateral.
-    - **Axial:** desde arriba. Se ven la rótula y la fosa poplítea, donde está el quiste de Baker.
-  - **Secuencia:** cómo se adquirió la imagen, lo que cambia el contraste. Las *sensibles a líquido* hacen brillar el agua (derrame, edema). La *supresión grasa* oscurece la grasa para que resalte el líquido.
-- **Corte:** una sola imagen 2D, un archivo DICOM. Los cortes de una serie, apilados, forman el volumen 3D de la rodilla (~30 por serie).
+- **Study:** one MRI session of one knee. It has a radiologist report and is the unit we classify: the 12 findings are predicted per study.
+- **Series:** one acquisition within the study, in one **plane** and with one **sequence** type. A study usually has 5 series (3 to 14): each plane can have several, with different sequences.
+  - **Plane:** the direction of the cut.
+    - **Sagittal:** side view. Shows the cruciate ligaments (ACL) and the menisci well.
+    - **Coronal:** front view. Shows the MCL and the medial and lateral compartments.
+    - **Axial:** top view. Shows the patella and the popliteal fossa, where Baker's cysts sit.
+  - **Sequence:** how the image was acquired, which changes the contrast. *Fluid-sensitive* sequences make water bright (effusion, edema). *Fat suppression* darkens fat so that fluid stands out.
+- **Slice:** a single 2D image, one DICOM file. Stacked, the slices of a series form the 3D volume of the knee (~30 per series).

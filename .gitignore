@@ -8,6 +8,7 @@ __pycache__/
 data/*
 !data/.gitkeep
 !data/README.md
+!data/README.es.md
 
 # LaTeX
 informe/*.aux

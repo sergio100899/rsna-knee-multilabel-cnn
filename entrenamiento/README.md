@@ -1,40 +1,42 @@
-# entrenamiento/
+# entrenamiento/ (training)
 
-Entrena las dos arquitecturas con el esquema maestro-alumno, en 5 folds.
+**English** · [Español](README.es.md)
+
+Trains both architectures with the teacher-student scheme, in 5 folds.
 
 ```bash
-uv run python -m entrenamiento.entrenar todo   # con uv
-python -m entrenamiento.entrenar todo          # con pip (con el entorno .venv activado)
+uv run python -m entrenamiento.entrenar todo   # with uv
+python -m entrenamiento.entrenar todo          # with pip (with the .venv environment activated)
 ```
 
-Una etapa o algunos folds: `python -m entrenamiento.entrenar maestro 0 1` (etapas: `maestro`, `etiquetas`, `alumno`, `convnext`).
+One stage or some folds: `python -m entrenamiento.entrenar maestro 0 1` (stages: `maestro` = teacher, `etiquetas` = teacher labels, `alumno` = CNN student, `convnext` = ConvNeXt student).
 
-| Archivo | Qué contiene |
+| File | Contents |
 |---|---|
-| `comun.py` | Dataset 2.5D (vista completa + zoom), las dos redes, pérdida focal y bucle de entrenamiento |
-| `entrenar.py` | Las 4 etapas del maestro-alumno |
+| `comun.py` | 2.5D dataset (full view + zoom), both networks, focal loss and training loop |
+| `entrenar.py` | The 4 teacher-student stages |
 
 ```mermaid
 flowchart LR
-    D["Etiqueta débil<br/>etiquetas_hibrido_gemma"] --> M["Maestro<br/>CNN desde cero"]
-    M --> O["Predicción fuera de fold<br/>a la escala de la débil"]
-    D --> X["0,5 · débil + 0,5 · maestro<br/>etiquetas_maestro"]
+    D["Weak label<br/>etiquetas_hibrido_gemma"] --> M["Teacher<br/>CNN from scratch"]
+    M --> O["Out-of-fold prediction<br/>on the weak-label scale"]
+    D --> X["0.5 · weak + 0.5 · teacher<br/>etiquetas_maestro"]
     O --> X
-    X --> A1["Alumno · arquitectura 1<br/>CNN desde cero"]
-    X --> A2["Alumno · arquitectura 2<br/>ConvNeXt-Tiny (ImageNet)"]
+    X --> A1["Student · architecture 1<br/>CNN from scratch"]
+    X --> A2["Student · architecture 2<br/>ConvNeXt-Tiny (ImageNet)"]
 ```
 
-**Entrada:** de cada plano, 12 cortes repartidos; cada corte con sus 2 vecinos como canales RGB (2.5D). Cada una de las 36 imágenes entra dos veces: completa (150 mm) y con zoom a los 100 mm centrales, ambas a 224 px. La red resume las 72 con media y máximo y da 12 salidas sigmoides.
+**Input:** 12 evenly spaced slices per plane; each slice with its 2 neighbors as RGB channels (2.5D). Each of the 36 images enters twice: full view (150 mm) and zoomed on the central 100 mm, both at 224 px. The network pools the 72 with mean and max and outputs 12 sigmoids.
 
-| | Arquitectura 1 | Arquitectura 2 |
+| | Architecture 1 | Architecture 2 |
 |---|---|---|
-| Red | CNN desde cero: stem + 4 etapas de conv 3×3 + pirámide (1,25 M parámetros) | ConvNeXt-Tiny preentrenada en ImageNet (27,9 M) |
-| Épocas | 30 | 15 |
-| Learning rate | 10⁻³ | 10⁻⁴ en la red, 10⁻³ en la cabeza |
-| Lote | 8 estudios | 2 estudios × 4 de acumulación |
+| Network | CNN from scratch: stem + 4 stages of 3×3 convs + feature pyramid (1.25 M parameters) | ConvNeXt-Tiny pretrained on ImageNet (27.9 M) |
+| Epochs | 30 | 15 |
+| Learning rate | 10⁻³ | 10⁻⁴ for the backbone, 10⁻³ for the head |
+| Batch | 8 studies | 2 studies × 4 accumulation steps |
 
-Común a las dos: pérdida focal (γ = 2), AdamW con OneCycle, validación contra la etiqueta débil y gold aparte.
+Shared by both: focal loss (γ = 2), AdamW with OneCycle, validation against the weak label and gold kept apart.
 
-Cada modelo se guarda en `data/runs/<etapa>_f<fold>/` (`modelo.pt`, `historial.csv`, `checkpoint.pt`). El checkpoint es por época: si se interrumpe, el mismo comando lo retoma. Con `PARAR_EN=N` el entrenamiento se pausa al terminar la época N.
+Each model is saved in `data/runs/<stage>_f<fold>/` (`modelo.pt`, `historial.csv`, `checkpoint.pt`). The checkpoint is saved every epoch: if training stops, the same command resumes it. With `PARAR_EN=N` training pauses at the end of epoch N.
 
-Con una GPU de 48 GB: ~1 h por fold de la CNN y ~1 h por fold de ConvNeXt, unas 15 h en total.
+On a 48 GB GPU: ~1 h per CNN fold and ~1 h per ConvNeXt fold, about 15 h in total.

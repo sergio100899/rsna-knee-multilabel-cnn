@@ -1,30 +1,31 @@
-# imagenes/
+# imagenes/ (images)
 
-Convierte los DICOM de `data/rsna/` en un volumen por plano y estudio, listo para entrenar, y arma los folds de validación cruzada.
+**English** · [Español](README.es.md)
+
+Converts the DICOM files in `data/rsna/` into one volume per plane and study, ready for training, and builds the cross-validation folds.
 
 ```bash
-uv run python -m imagenes.generar   # con uv
-python -m imagenes.generar          # con pip (con el entorno .venv activado)
+uv run python -m imagenes.generar   # with uv
+python -m imagenes.generar          # with pip (with the .venv environment activated)
 ```
 
-| Orden | Script | Qué hace | Salida en `data/` |
+| Order | Script | What it does | Output in `data/` |
 |---|---|---|---|
-| 1 | `preparar.py` | Elige una serie por plano, la preprocesa y arma los folds | `imagenes/*.npz`, `series.csv`, `indice.csv` |
-| 2 | `lateralidad.py` | Completa con una CNN el lado de la rodilla que falta | `indice.csv` (lado final), `modelos/lateralidad_cnn.pt` |
+| 1 | `preparar.py` | Picks one series per plane, preprocesses it and builds the folds | `imagenes/*.npz`, `series.csv`, `indice.csv` |
+| 2 | `lateralidad.py` | Fills in the missing knee side with a CNN | `indice.csv` (final side), `modelos/lateralidad_cnn.pt` |
 
 ```mermaid
 flowchart LR
-    D["Estudio<br/>3–14 series DICOM"] --> E["1 serie por plano<br/>sagital · coronal · axial<br/>(prefiere sensible a líquido)"]
-    E --> P["Preprocesado<br/>recorte 150 mm · contraste<br/>320 × 320 px"]
-    P --> N["imagenes/&lt;estudio&gt;.npz"]
-    D --> L["Lado de la rodilla<br/>DICOM → informe → CNN"]
-    D --> S["Escáner<br/>fabricante · modelo · campo · bobina"]
-    S --> F["5 folds<br/>(un escáner nunca en dos folds)"]
+    D["Study<br/>3–14 DICOM series"] --> E["1 series per plane<br/>sagittal · coronal · axial<br/>(fluid-sensitive preferred)"]
+    E --> P["Preprocessing<br/>150 mm crop · contrast<br/>320 × 320 px"]
+    P --> N["imagenes/&lt;study&gt;.npz"]
+    D --> L["Knee side<br/>DICOM → report → CNN"]
+    D --> S["Scanner<br/>manufacturer · model · field · coil"]
+    S --> F["5 folds<br/>(a scanner is never in two folds)"]
     L --> I["indice.csv"]
     F --> I
 ```
 
-**Folds:** los 4349 estudios silver se reparten en 5 grupos (`GroupKFold`) agrupando por escáner. Así el modelo siempre se valida en escáneres que no vio, como pasa con el test de Kaggle, que viene de otros centros. Los 58 gold llevan `fold = -1` y no se usan para entrenar.
+**Folds:** the 4349 silver studies are split into 5 groups (`GroupKFold`) grouped by scanner. The model is therefore always validated on scanners it has not seen, as happens with the Kaggle test set, which comes from other centers. The 58 gold studies have `fold = -1` and are never used for training.
 
-**Lado:** al cargar, las rodillas izquierdas se reflejan para que medial y lateral queden siempre en el mismo lado de la imagen.
-
+**Side:** when loading, left knees are mirrored so that medial and lateral always sit on the same side of the image.
